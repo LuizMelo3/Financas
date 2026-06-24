@@ -51,7 +51,7 @@ export default function Layout() {
         <div className="flex items-center gap-3 p-4 border-b border-slate-700">
           <span className="text-2xl">💰</span>
           <div className="min-w-0">
-            <div className="font-bold text-white text-sm">FinanceiroApp</div>
+            <div className="font-bold text-white text-sm">Grana</div>
             <div className="text-xs text-slate-400 truncate">{user.name || 'Controle financeiro'}</div>
           </div>
           <button onClick={() => setOpen(false)} className="ml-auto lg:hidden text-slate-400 hover:text-white flex-shrink-0">
@@ -98,7 +98,7 @@ export default function Layout() {
           <button onClick={() => setOpen(true)} className="text-slate-400 hover:text-white">
             <Menu size={20} />
           </button>
-          <span className="font-bold text-white text-sm flex-1">FinanceiroApp</span>
+          <span className="font-bold text-white text-sm flex-1">Grana</span>
           <button onClick={logout} className="text-slate-400 hover:text-rose-400 transition-colors">
             <LogOut size={18} />
           </button>

@@ -23,5 +23,5 @@ if (isProduction || !distExists) {
   execSync('npm run build', { cwd: clientDir, stdio: 'inherit' });
 }
 
-console.log('\n✅ Iniciando FinanceiroApp em http://localhost:3000\n');
+console.log('\n✅ Iniciando Grana em http://localhost:3000\n');
 require('./server/index.js');

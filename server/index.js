@@ -859,7 +859,7 @@ initSql().then(SQL => {
   createSchema();
   seedCategories();
   app.listen(PORT, () => {
-    console.log(`FinanceiroApp → http://localhost:${PORT}`);
+    console.log(`Grana → http://localhost:${PORT}`);
   });
 }).catch(err => {
   console.error('Erro ao inicializar DB:', err);

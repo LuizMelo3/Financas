@@ -1,4 +1,4 @@
-# FinanceiroApp — Controle Financeiro Pessoal
+# Grana — Controle Financeiro Pessoal
 
 Aplicação web completa para controle financeiro pessoal com suporte a múltiplos usuários. Cada usuário tem seus dados completamente isolados.
 
