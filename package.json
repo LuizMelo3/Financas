@@ -1,0 +1,8 @@
+{
+  "name": "financeiroapp",
+  "version": "1.0.0",
+  "description": "Controle financeiro pessoal completo",
+  "scripts": {
+    "start": "node start.js"
+  }
+}
