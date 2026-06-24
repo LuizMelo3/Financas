@@ -1,9 +1,24 @@
 const BASE = '/api';
 
+function getToken() {
+  return localStorage.getItem('finance_token');
+}
+
 async function req(method, path, body) {
+  const token = getToken();
   const opts = { method, headers: { 'Content-Type': 'application/json' } };
-  if (body) opts.body = JSON.stringify(body);
+  if (token) opts.headers['Authorization'] = `Bearer ${token}`;
+  if (body)  opts.body = JSON.stringify(body);
+
   const r = await fetch(BASE + path, opts);
+
+  if (r.status === 401) {
+    localStorage.removeItem('finance_token');
+    localStorage.removeItem('finance_user');
+    window.location.href = '/login';
+    return;
+  }
+
   if (!r.ok) {
     const msg = await r.text().catch(() => r.statusText);
     throw new Error(msg || r.statusText);
@@ -14,13 +29,18 @@ async function req(method, path, body) {
 }
 
 export const api = {
-  get:    (path)        => req('GET',    path),
-  post:   (path, body)  => req('POST',   path, body),
-  put:    (path, body)  => req('PUT',    path, body),
-  del:    (path)        => req('DELETE', path),
-  patch:  (path, body)  => req('PATCH',  path, body),
+  get:   (path)       => req('GET',    path),
+  post:  (path, body) => req('POST',   path, body),
+  put:   (path, body) => req('PUT',    path, body),
+  del:   (path)       => req('DELETE', path),
+  patch: (path, body) => req('PATCH',  path, body),
 
-  // Domain shortcuts
+  auth: {
+    register: (body) => req('POST', '/auth/register', body),
+    login:    (body) => req('POST', '/auth/login',    body),
+    me:       ()     => req('GET',  '/auth/me'),
+  },
+
   dashboard:  ()     => api.get('/dashboard'),
   accounts:   ()     => api.get('/accounts'),
   transfers:  (body) => api.post('/transfers', body),
@@ -59,18 +79,18 @@ export const api = {
   },
 
   cards: {
-    list:      ()        => api.get('/credit-cards'),
-    create:    (body)    => api.post('/credit-cards', body),
-    del:       (id)      => api.del(`/credit-cards/${id}`),
-    purchases: (id)      => api.get(`/credit-cards/${id}/purchases`),
-    buy:       (id, b)   => api.post(`/credit-cards/${id}/purchase`, b),
-    pay:       (cId, pId)=> api.post(`/credit-cards/${cId}/purchases/${pId}/pay`, {}),
+    list:      ()         => api.get('/credit-cards'),
+    create:    (body)     => api.post('/credit-cards', body),
+    del:       (id)       => api.del(`/credit-cards/${id}`),
+    purchases: (id)       => api.get(`/credit-cards/${id}/purchases`),
+    buy:       (id, b)    => api.post(`/credit-cards/${id}/purchase`, b),
+    pay:       (cId, pId) => api.post(`/credit-cards/${cId}/purchases/${pId}/pay`, {}),
   },
 
   budgets: {
-    list:   (month) => api.get('/budgets' + (month ? `?month=${month}` : '')),
-    save:   (body)  => api.post('/budgets', body),
-    del:    (id)    => api.del(`/budgets/${id}`),
+    list: (month) => api.get('/budgets' + (month ? `?month=${month}` : '')),
+    save: (body)  => api.post('/budgets', body),
+    del:  (id)    => api.del(`/budgets/${id}`),
   },
 
   reports: {
@@ -78,7 +98,7 @@ export const api = {
     csvUrl: (params) => '/api/reports/csv?' + new URLSearchParams(params||{}).toString(),
   },
 
-  backup:  () => api.get('/backup'),
+  backup:  ()     => api.get('/backup'),
   restore: (data) => api.post('/restore', data),
-  clear:   () => api.post('/clear', {}),
+  clear:   ()     => api.post('/clear', {}),
 };
