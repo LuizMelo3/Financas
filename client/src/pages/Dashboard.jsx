@@ -93,9 +93,17 @@ export default function Dashboard() {
   const viewMonthData     = viewMonth ? (monthly||[]).find(m => m.month === viewMonth) : null;
   const viewScheduleData  = viewMonth ? (debtSchedule||[]).find(m => m.month === viewMonth) : null;
 
-  const dispIncome    = viewMonthData ? viewMonthData.income    : monthlyIncome;
-  const dispExpense   = viewMonthData ? viewMonthData.expense   : monthlyExpense;
-  const dispDebtTotal = viewMonthData ? viewMonthData.debtTotal : monthlyDebtTotal;
+  const schedDebtTotal = viewScheduleData
+    ? viewScheduleData.debts.reduce((s, d) => s + d.value, 0)
+    : 0;
+
+  const dispIncome    = viewMonthData    ? viewMonthData.income    : monthlyIncome;
+  const dispExpense   = viewScheduleData ? viewScheduleData.total
+                      : viewMonthData    ? viewMonthData.expense
+                      :                   monthlyExpense;
+  const dispDebtTotal = viewScheduleData ? schedDebtTotal
+                      : viewMonthData    ? viewMonthData.debtTotal
+                      :                   monthlyDebtTotal;
 
   // Saldo projetado: saldo atual + receitas do mês selecionado − despesas do mês selecionado
   const projectedBalance = viewMonthData ? balance + viewMonthData.saldo : balance;
@@ -122,7 +130,8 @@ export default function Dashboard() {
     Saldo:    m.saldo,
   }));
 
-  const pieData = (expByCategory||[]).slice(0,8).map(c => ({ name: c.category||'Outros', value: c.total }));
+  const currentExpByCategory = viewMonthData?.expByCategory || expByCategory;
+  const pieData = (currentExpByCategory||[]).slice(0,8).map(c => ({ name: c.category||'Outros', value: c.total }));
 
   // Itens do mês selecionado no schedule
   const viewAllItems = viewScheduleData ? [
@@ -259,7 +268,10 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <div className="text-sm font-medium text-slate-300 mb-3">Despesas por categoria</div>
+          <div className="text-sm font-medium text-slate-300 mb-3">
+            Despesas por categoria
+            {viewMonth && <span className="ml-1 text-xs text-indigo-400 font-normal">— {viewMonthLabel}</span>}
+          </div>
           {pieData.length > 0 ? (
             <>
               <ResponsiveContainer width="100%" height={160}>

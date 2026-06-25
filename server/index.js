@@ -712,9 +712,14 @@ app.get('/api/dashboard', authenticateToken, (req, res) => {
       .reduce((s, dd) => s + debtInstallmentValue(dd), 0);
     const totalInc = (inc?.s||0) + recurringIncAmt;
     const totalExp = (exp?.s||0) + recurringAmt + debtInst;
+    const expByCatMonth = all(
+      `SELECT category, SUM(amount) as total FROM transactions
+       WHERE user_id=? AND type='expense' AND date LIKE ? GROUP BY category ORDER BY total DESC`,
+      [userId, m+'%']
+    );
     monthly.push({ month: m, income: totalInc, expense: totalExp,
       debtTotal: parseFloat(debtInst.toFixed(2)),
-      saldo: totalInc - totalExp });
+      saldo: totalInc - totalExp, expByCategory: expByCatMonth });
   }
 
   const expByCat = all(
